@@ -11,10 +11,11 @@ const client = new Client({
   ],
 });
 
-const supportRoleId = '1342234583986602116';  
+const supportRoleId = '1315789205456158772';  
 const rulesRoleId = '1273371095126511697';
-const blockedUserId = '781182318252523610';
 const allowedChannelId = '1273369544425082968';
+const disallowedUserId = "781182318252523610";
+const allowedUserIds = ["352980397992312833", "904141189610110976", "784802796758106152"];
 const prefix = '!';  
 const userLevels = new Map();
 const calculateLevelThreshold = (level) => {
@@ -25,6 +26,26 @@ client.once('ready', () => {
   console.log('Bot ist online!');
   client.user.setActivity('CozyDanny', { type: ActivityType.Listening });
 });
+
+
+//!===============Here the message will be deleted if the user is not in the list of allowed users===============
+
+
+
+client.on('messageCreate', (message) => {
+  if (message.author.bot) return;
+
+  const mentionedUsers = message.mentions.users;
+
+  if (mentionedUsers.has(disallowedUserId)) {
+      if (!allowedUserIds.includes(message.author.id)) {
+          message.delete();
+      }
+  }
+});
+
+
+//!===============Here the message will be deleted if the user is not in the list of allowed users for videos/images===============
 
 
 client.on('messageCreate', async (message) => {
@@ -55,6 +76,9 @@ client.on('messageCreate', async (message) => {
 });
 
 
+//!===============simple level system===============
+
+
 
 client.on('messageCreate', async (message) => {
   if (message.author.bot) return; 
@@ -77,18 +101,7 @@ client.on('messageCreate', async (message) => {
 });
 
 
-
-client.on('messageCreate', async (message) => {
-  if (message.author.bot) return;  
-  
-  if (message.mentions.has(client.users.cache.get(blockedUserId))) {
-    await message.delete();
-
-    await message.author.send({
-      content: `You are not allowed to mention this user.`,
-    }).catch(err => console.error("Fehler beim Senden der Nachricht an den Benutzer:", err));
-  }
-});
+//!===============Giveaway==========================
 
 
 client.on('messageCreate', async (message) => {
@@ -223,6 +236,8 @@ client.on('interactionCreate', async (interaction) => {
 });
 
 
+//!===============Rules with reaction role==========================
+
 
 client.on('messageCreate', async (message) => {
   if (message.author.bot) return;
@@ -301,6 +316,10 @@ client.on('interactionCreate', async (interaction) => {
     }
   }
 });
+
+
+//!===============Ticket System with transcript==========================
+
 
 client.on('messageCreate', async (message) => {
   if (message.author.bot) return;
@@ -570,4 +589,4 @@ client.on('interactionCreate', async (interaction) => {
   }
 });
 
-client.login(process.env.DISCORD_TOKEN); 
+client.login(process.env.TOKEN)
